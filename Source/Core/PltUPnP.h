@@ -115,6 +115,11 @@ public:
      @return True if the UPnP engine is running.
      */
     bool IsRunning() { return m_Started; }
+    /*
+     *  Changed by Shahid
+     *  If startDiscover is true it will start the discovery otherwise not. By default true.
+     */
+    bool startDsicovery = true;
 
     /**
      When a device and a control point are added to the same UPnP context, it is

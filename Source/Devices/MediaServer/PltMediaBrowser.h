@@ -78,6 +78,11 @@ public:
     virtual void OnMSStateVariablesChanged(
         PLT_Service*                  /*service*/, 
         NPT_List<PLT_StateVariable*>* /*vars*/) {}
+    /*
+     *  Changed by Shahid
+     *  Delegate to notify description fetching failure
+     */
+    virtual void OnDescriptionFailure(NPT_Url /*url*/) {};
 
     // ContentDirectory
     virtual void OnBrowseResult(
@@ -135,6 +140,11 @@ protected:
     virtual NPT_Result OnDeviceRemoved(PLT_DeviceDataReference& device);
     virtual NPT_Result OnActionResponse(NPT_Result res, PLT_ActionReference& action, void* userdata);
     virtual NPT_Result OnEventNotify(PLT_Service* service, NPT_List<PLT_StateVariable*>* vars);
+    /*
+     *  Changed by Shahid
+     *  Listener method to get notifiy about description failure
+     */
+    virtual NPT_Result OnDescriptionFailure(NPT_Url url);
     
     // ContentDirectory service responses
     virtual NPT_Result OnBrowseResponse(NPT_Result               res, 

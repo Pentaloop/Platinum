@@ -121,6 +121,25 @@ private:
 };
 
 /*----------------------------------------------------------------------
+ |   Change by Shahid
+ |   PLT_CtrlPointListenerOnEventNotifyIterator class
+ +---------------------------------------------------------------------*/
+class PLT_CtrlPointListenerOnDescriptionFailureIterator
+{
+public:
+    NPT_Url m_url;
+    PLT_CtrlPointListenerOnDescriptionFailureIterator(NPT_Url url) : m_url(url) { }
+    
+    NPT_Result operator()(PLT_CtrlPointListener*& listener) const {
+        return listener->OnDescriptionFailure(m_url);
+    }
+    
+private:
+    PLT_Service*                  m_Service;
+    NPT_List<PLT_StateVariable*>* m_Vars;
+};
+
+/*----------------------------------------------------------------------
 |   PLT_AddGetSCPDRequestIterator class
 +---------------------------------------------------------------------*/
 class PLT_AddGetSCPDRequestIterator
@@ -267,17 +286,21 @@ PLT_CtrlPoint::Start(PLT_SsdpListenTask* task)
 {
     if (m_Started) NPT_CHECK_WARNING(NPT_ERROR_INVALID_STATE);
     
-    m_TaskManager = new PLT_TaskManager();
+    /*
+     *  Changed by Shahid
+     *  If task is available then start the server and start listening to its events
+     */
+    if (task) {
+        m_EventHttpServer = new PLT_HttpServer();
+        m_EventHttpServer->AddRequestHandler(new PLT_HttpRequestHandler(this), "/", true, true);
+        m_EventHttpServer->Start();
+        
+        task->AddListener(this);
+    }
     
-    m_EventHttpServer = new PLT_HttpServer();
-    m_EventHttpServer->AddRequestHandler(new PLT_HttpRequestHandler(this), "/", true, true);
-    m_EventHttpServer->Start();
-
+    m_TaskManager = new PLT_TaskManager();
     // house keeping task
     m_TaskManager->StartTask(new PLT_CtrlPointHouseKeepingTask(this));
-
-    // add ourselves as an listener to SSDP multicast advertisements
-    task->AddListener(this);
 
     //    
     // use next line instead for DLNA testing, faster frequency for M-SEARCH
@@ -311,9 +334,15 @@ PLT_CtrlPoint::Stop(PLT_SsdpListenTask* task)
     
     m_Started = false;
     
-    task->RemoveListener(this);
-
-    m_EventHttpServer->Stop();
+    /*
+     *  Changed by Shahid
+     *  If task is available then remove the listener and stop server
+     */
+    if (task) {
+        task->RemoveListener(this);
+        m_EventHttpServer->Stop();
+    }
+    
     m_TaskManager->Abort();
 
     // force remove all devices
@@ -1379,6 +1408,12 @@ PLT_CtrlPoint::ProcessGetDescriptionResponse(NPT_Result                    res,
     return NPT_SUCCESS;
 
 bad_response:
+    /*
+     *  Changed by Shahid
+     *  If failed to fetch description then notifity to all listeneres
+     */
+    m_ListenerList.Apply(PLT_CtrlPointListenerOnDescriptionFailureIterator(request.GetUrl()));
+    
     NPT_LOG_SEVERE_2("Bad Description response @ %s: %s", 
         (const char*)request.GetUrl().ToString(),
         (const char*)desc);

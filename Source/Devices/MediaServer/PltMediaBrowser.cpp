@@ -328,6 +328,19 @@ PLT_MediaBrowser::OnActionResponse(NPT_Result           res,
 }
 
 /*----------------------------------------------------------------------
+ |   Change by Shahid
+ |   PLT_MediaBrowser::OnDescriptionFailure
+ +---------------------------------------------------------------------*/
+NPT_Result PLT_MediaBrowser::OnDescriptionFailure(NPT_Url url)
+{
+    m_Delegate->OnDescriptionFailure(url);
+    printf("Description Failed : %s", url.ToString().GetChars());
+    return NPT_SUCCESS;
+}
+
+
+
+/*----------------------------------------------------------------------
 |   PLT_MediaBrowser::OnBrowseResponse
 +---------------------------------------------------------------------*/
 NPT_Result

@@ -74,6 +74,11 @@ public:
     virtual NPT_Result OnDeviceRemoved(PLT_DeviceDataReference& device) = 0;
     virtual NPT_Result OnActionResponse(NPT_Result res, PLT_ActionReference& action, void* userdata) = 0;
     virtual NPT_Result OnEventNotify(PLT_Service* service, NPT_List<PLT_StateVariable*>* vars) = 0;
+    /*
+     *  Changed by Shahid
+     *  Description failure method
+     */
+    virtual NPT_Result OnDescriptionFailure(NPT_Url url) = 0;
 };
 
 typedef NPT_List<PLT_CtrlPointListener*> PLT_CtrlPointListenerList;

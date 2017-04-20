@@ -160,29 +160,43 @@ PLT_UPnP::Start()
 
     if (m_Started) NPT_CHECK_WARNING(NPT_ERROR_INVALID_STATE);
     
-    NPT_List<NPT_IpAddress> ips;
-    PLT_UPnPMessageHelper::GetIPAddresses(ips);
+
+    /*
+     *  Change by Shahid
+     *  If startDiscovery is true it will start looking for new servers
+     */
+    if (startDsicovery) {
+        
+        NPT_List<NPT_IpAddress> ips;
+        PLT_UPnPMessageHelper::GetIPAddresses(ips);
+        
+        /* Create multicast socket and bind on 1900. If other apps didn't
+         play nicely by setting the REUSE_ADDR flag, this could fail */
+        NPT_Reference<NPT_UdpMulticastSocket> socket(new NPT_UdpMulticastSocket(NPT_SOCKET_FLAG_CANCELLABLE));
+        NPT_CHECK_SEVERE(socket->Bind(NPT_SocketAddress(NPT_IpAddress::Any, 1900), true));
+        
+        /* Join multicast group for every ip we found */
+        NPT_CHECK_SEVERE(ips.ApplyUntil(PLT_SsdpInitMulticastIterator(socket.AsPointer()),
+                                        NPT_UntilResultNotEquals(NPT_SUCCESS)));
+        
+        /* create the ssdp listener */
+        m_SsdpListenTask = new PLT_SsdpListenTask(socket.AsPointer());
+        socket.Detach();
+        NPT_Reference<PLT_TaskManager> taskManager(new PLT_TaskManager());
+        NPT_CHECK_SEVERE(taskManager->StartTask(m_SsdpListenTask));
+        
+        /* start devices & ctrlpoints */
+        m_CtrlPoints.Apply(PLT_UPnP_CtrlPointStartIterator(m_SsdpListenTask));
+        m_Devices.Apply(PLT_UPnP_DeviceStartIterator(m_SsdpListenTask));
+        
+        m_TaskManager = taskManager;
+    }
+    else{
+        /* start devices & ctrlpoints */
+        m_CtrlPoints.Apply(PLT_UPnP_CtrlPointStartIterator(NULL));
+        m_Devices.Apply(PLT_UPnP_DeviceStartIterator(NULL));
+    }
     
-    /* Create multicast socket and bind on 1900. If other apps didn't
-       play nicely by setting the REUSE_ADDR flag, this could fail */
-    NPT_Reference<NPT_UdpMulticastSocket> socket(new NPT_UdpMulticastSocket(NPT_SOCKET_FLAG_CANCELLABLE));
-    NPT_CHECK_SEVERE(socket->Bind(NPT_SocketAddress(NPT_IpAddress::Any, 1900), true));
-    
-    /* Join multicast group for every ip we found */
-    NPT_CHECK_SEVERE(ips.ApplyUntil(PLT_SsdpInitMulticastIterator(socket.AsPointer()),
-                                    NPT_UntilResultNotEquals(NPT_SUCCESS)));
-
-    /* create the ssdp listener */
-    m_SsdpListenTask = new PLT_SsdpListenTask(socket.AsPointer());
-    socket.Detach();
-    NPT_Reference<PLT_TaskManager> taskManager(new PLT_TaskManager());
-    NPT_CHECK_SEVERE(taskManager->StartTask(m_SsdpListenTask));
-
-    /* start devices & ctrlpoints */
-    m_CtrlPoints.Apply(PLT_UPnP_CtrlPointStartIterator(m_SsdpListenTask));
-    m_Devices.Apply(PLT_UPnP_DeviceStartIterator(m_SsdpListenTask));
-
-    m_TaskManager = taskManager;
     m_Started = true;
     return NPT_SUCCESS;
 }
@@ -198,13 +212,20 @@ PLT_UPnP::Stop()
     if (!m_Started) NPT_CHECK_WARNING(NPT_ERROR_INVALID_STATE);
 
     NPT_LOG_INFO("Stopping UPnP...");
-
+    
     // Stop ctrlpoints and devices first
     m_CtrlPoints.Apply(PLT_UPnP_CtrlPointStopIterator(m_SsdpListenTask));
     m_Devices.Apply(PLT_UPnP_DeviceStopIterator(m_SsdpListenTask));
 
-    // stop remaining tasks
-    m_TaskManager->Abort();
+    /*
+     *  Changed by Shahid
+     *  If listening task is available then abort the task manager
+     */
+    if (m_SsdpListenTask) {
+        // stop remaining tasks
+        m_TaskManager->Abort();
+    }
+    
     m_SsdpListenTask = NULL;
     m_TaskManager = NULL;
 
