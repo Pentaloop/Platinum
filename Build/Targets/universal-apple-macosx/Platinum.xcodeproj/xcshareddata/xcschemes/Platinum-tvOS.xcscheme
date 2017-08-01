@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0620"
+   LastUpgradeVersion = "0830"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E41016201ACFA826000E994F"
-               BuildableName = "Platinum.framework"
-               BlueprintName = "Platinum-iOS"
+               BlueprintIdentifier = "9BAC481F1F307493003E8C55"
+               BuildableName = "Platinum-tvOS.framework"
+               BlueprintName = "Platinum-tvOS"
                ReferencedContainer = "container:Platinum.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E41016201ACFA826000E994F"
-            BuildableName = "Platinum.framework"
-            BlueprintName = "Platinum-iOS"
+            BlueprintIdentifier = "9BAC481F1F307493003E8C55"
+            BuildableName = "Platinum-tvOS.framework"
+            BlueprintName = "Platinum-tvOS"
             ReferencedContainer = "container:Platinum.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E41016201ACFA826000E994F"
-            BuildableName = "Platinum.framework"
-            BlueprintName = "Platinum-iOS"
+            BlueprintIdentifier = "9BAC481F1F307493003E8C55"
+            BuildableName = "Platinum-tvOS.framework"
+            BlueprintName = "Platinum-tvOS"
             ReferencedContainer = "container:Platinum.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
