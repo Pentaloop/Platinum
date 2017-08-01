@@ -1,3 +1,14 @@
+## Changes in fork from Original Repo:
+The repo is intended to be maintained as we use it our selves. Here are the changes we have done to the original repo, in this fork:
+
+- Support for connecting to a server without enabling discovery.
+- Support for Apple tvOS added.
+
+## TODO (this fork):
+
+- Added an example project for Apple tvOS.
+
+
 #PLATINUM UPNP SDK [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![Build Status](https://travis-ci.org/plutinosoft/Platinum.svg?branch=master)](https://travis-ci.org/plutinosoft/Platinum)
 
 This toolkit consists of 2 modules:
