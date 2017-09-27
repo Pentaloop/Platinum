@@ -80,9 +80,7 @@ env['NPT_EXTRA_LIBS'] = ['gcc']
 LoadTool('gcc-generic', env, gcc_cross_prefix=ANDROID_CROSS_PREFIX, gcc_strict=False)
 env.AppendUnique(CCFLAGS = ['-I'+ANDROID_NDK_ROOT+'/sources/cxx-stl/system/include' ,
                             '--sysroot', ANDROID_SYSROOT,
-                            '-msoft-float',
                             '-fpic',
-                            '-mthumb-interwork',
                             '-ffunction-sections',
                             '-funwind-tables',
                             '-fstack-protector',
