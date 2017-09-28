@@ -59,12 +59,16 @@ if ARGUMENTS.get('android_platform'):
 
 if ARGUMENTS.get('android_arch'):
     ANDROID_ARCH=ARGUMENTS.get('android_arch')
+	
+if ARGUMENTS.get('android_arch_abi'):
+    ANDROID_ARCH_ABI=ARGUMENTS.get('android_arch_abi')
 
 print 'Building for Android: '
 print 'ANDROID_HOST_SYSTEM =', ANDROID_HOST_SYSTEM
 print 'ANDROID_TOOLCHAIN   =', ANDROID_TOOLCHAIN
 print 'ANDROID_PLATFORM    =', ANDROID_PLATFORM
 print 'ANDROID_ARCH        =', ANDROID_ARCH
+print 'ANDROID_ARCH_ABI        =', ANDROID_ARCH_ABI
 
 ANDROID_TOOLCHAIN_BIN = ANDROID_NDK_ROOT+'/toolchains/'+ANDROID_TOOLCHAIN+'/prebuilt/'+ANDROID_HOST_SYSTEM+'/bin'
 ANDROID_SYSROOT = ANDROID_NDK_ROOT+'/platforms/'+ANDROID_PLATFORM+'/arch-'+ANDROID_ARCH
@@ -78,23 +82,25 @@ env['NPT_EXTRA_LIBS'] = ['gcc']
 
 ### Load the tools
 LoadTool('gcc-generic', env, gcc_cross_prefix=ANDROID_CROSS_PREFIX, gcc_strict=False)
-env.AppendUnique(CCFLAGS = ['-I'+ANDROID_NDK_ROOT+'/sources/cxx-stl/system/include' ,
+env.AppendUnique(CCFLAGS = ['-I'+ANDROID_NDK_ROOT+'/sources/cxx-stl/llvm-libc++/include' ,
                             '--sysroot', ANDROID_SYSROOT,
                             '-fpic',
                             '-ffunction-sections',
                             '-funwind-tables',
                             '-fstack-protector',
                             '-fno-short-enums'])
-env.AppendUnique(CXXFLAGS = ['-fno-exceptions', '-fno-rtti'])
+env.AppendUnique(CXXFLAGS = ['-fexceptions', '-frtti', '-fexceptions', '-std=gnu++11'])
 env.AppendUnique(CPPDEFINES = ['ANDROID', 'NPT_CONFIG_HAVE_SYSTEM_LOG_CONFIG'])
 env.AppendUnique(LINKFLAGS = ['--sysroot', ANDROID_SYSROOT,
                 			  '-Wl,--no-undefined',
                               '-Wl,-z,noexecstack',
                 			  '-L'+ANDROID_SYSROOT+'/usr/lib',
+							  '-L'+ANDROID_NDK_ROOT+'/sources/cxx-stl/llvm-libc++/libs/'+ANDROID_ARCH_ABI,
                 			  '-lc',
                 			  '-lstdc++',
+							  '-lc++',
                 			  '-lm',
-                			  '-llog',
+							  '-llog',
                 			  '-ldl'])
 
 ### Specific System choices
